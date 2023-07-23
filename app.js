@@ -1,7 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
-const helmet = require('helmet')
 const userRoute = require('./Routes/users')
 const authRoute = require('./Routes/auth')
 const postRoute = require('./Routes/posts')
@@ -24,10 +23,6 @@ app.use((req,res,next) => {
 
     next()
 })
-
-app.use(helmet({
-    crossOriginResourcePolicy: false,
-}))
 
 app.use('/images',express.static(path.join(__dirname,'/public/images')))
 
