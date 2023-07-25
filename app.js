@@ -8,6 +8,8 @@ const conversationRoute = require('./Routes/conversations')
 const messageRoute = require('./Routes/messages')
 const multer = require('multer')
 const path =require('path')
+const cookieParser  = require('cookie-parser')
+const requireAuth = require('./middleware/authMiddleware')
 
 const app =express()
 dotenv.config()
@@ -27,9 +29,8 @@ app.use((req,res,next) => {
 app.use('/images',express.static(path.join(__dirname,'/public/images')))
 
 
-//middleware
 app.use(express.json())
-
+app.use(cookieParser())
 
 const storage = multer.diskStorage({
     destination: (req,file,cb)=>{
@@ -49,10 +50,10 @@ app.post('/api/upload', upload.single('file'), (req,res) => {
     }
 })
 
-app.use('/api/users', userRoute)
+app.use('/api/users', requireAuth,userRoute)
 app.use('/api/auth', authRoute)
-app.use('/api/posts', postRoute)
-app.use('/api/conversations', conversationRoute)
-app.use('/api/messages', messageRoute)
+app.use('/api/posts', requireAuth,postRoute)
+app.use('/api/conversations',requireAuth, conversationRoute)
+app.use('/api/messages',requireAuth, messageRoute)
 
 module.exports = app
