@@ -44,7 +44,6 @@ router.post('/register', asyncHandler(async(req,res) => {
         //save user and return response
         const user = await newUser.save()
         const token = generateToken(user._id)
-        res.cookie('jwt',token, {httpOnly:true, maxAge:maxAge*1000})
         res.status(200).json({user:user, token:token})
     } catch (error) {
         console.log(error)
@@ -56,13 +55,16 @@ router.post('/register', asyncHandler(async(req,res) => {
 router.post('/login', async(req,res) => {
     try {
         const user = await User.findOne({email:req.body.email})
-        !user && res.status(404).json("user not found")
+        if(!user){
+            res.status(400).json('Incorrect email')
+        }
 
-        const validPassword = await bcrypt.compare(req.body.password, user.password)
-        !validPassword && res.status(400).json("incorrect password")
+        const validPassword = bcrypt.compare(req.body.password, user.password)
+        if(!validPassword){
+            res.status(400).json('Incorrect password')
+        }
 
         const token = generateToken(user._id)
-        res.cookie('jwt',token, {httpOnly:true, maxAge:maxAge*1000})
         res.status(200).json({user:user, token:token})
     } catch (error) {
         console.log(error)
